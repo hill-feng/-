@@ -361,13 +361,13 @@ class Tetris:
         top_scores = self.leaderboard.get_top(10)
         
         # 列表标题
-        header = self.font.render("Rank  Name       Score  Level", True, WHITE)
+        header = self.font.render("等级  名字  分数  级别", True, WHITE)
         self.screen.blit(header, (20, 70))
         
         # 绘制排行榜
         y_offset = 110
         if not top_scores:
-            empty_text = self.small_font.render("No scores yet", True, GRAY)
+            empty_text = self.small_font.render("没有分数记录", True, GRAY)
             self.screen.blit(empty_text, (SCREEN_WIDTH // 2 - 60, y_offset))
         else:
             for idx, entry in enumerate(top_scores[:10], 1):
@@ -491,7 +491,7 @@ class Tetris:
         skip_button.draw(self.screen)
         
         # 提示文本
-        hint_text = self.small_font.render("Enter your name (optional)", True, GRAY)
+        hint_text = self.small_font.render("输入你的名字", True, GRAY)
         self.screen.blit(hint_text, (SCREEN_WIDTH // 2 - 130, 250))
     
     def restart(self):
