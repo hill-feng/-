@@ -122,18 +122,18 @@ class Tetris:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("俄罗斯方块")
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font(None, 36)
-        self.small_font = pygame.font.Font(None, 24)
-        self.large_font = pygame.font.Font(None, 48)
+        self.font = self.load_font(36)
+        self.small_font = self.load_font(24)
+        self.large_font = self.load_font(48, bold=True)
         
         # 排行榜
         self.leaderboard = Leaderboard()
         
         # 按钮
-        self.start_button = Button(SCREEN_WIDTH // 2 - 75, 300, 150, 50, "Start Game", self.font)
-        self.leaderboard_button = Button(SCREEN_WIDTH // 2 - 75, 380, 150, 50, "Leaderboard", self.font)
-        self.quit_button = Button(SCREEN_WIDTH // 2 - 75, 460, 150, 50, "Quit", self.font)
-        self.restart_button = Button(SCREEN_WIDTH // 2 - 75, 550, 150, 50, "Return", self.font)
+        self.start_button = Button(SCREEN_WIDTH // 2 - 100, 300, 200, 50, "开始游戏", self.font)
+        self.leaderboard_button = Button(SCREEN_WIDTH // 2 - 100, 380, 200, 50, "排行榜", self.font)
+        self.quit_button = Button(SCREEN_WIDTH // 2 - 100, 460, 200, 50, "退出", self.font)
+        self.restart_button = Button(SCREEN_WIDTH // 2 - 100, 550, 200, 50, "重新开始", self.font)
         
         # 游戏状态
         self.game_state = "menu"  # menu, playing, game_over, leaderboard, name_input
@@ -160,6 +160,28 @@ class Tetris:
         self.key_cooldown = 0
         self.key_cooldown_max = 10
         
+    def load_font(self, size, bold=False):
+        """加载支持中文的字体文件，避免 pygame SysFont 在某些 Windows 环境崩溃"""
+        font_paths = [
+            r"C:\Windows\Fonts\simhei.ttf",
+            r"C:\Windows\Fonts\simsun.ttc",
+            r"C:\Windows\Fonts\simsunb.ttf",
+            r"C:\Windows\Fonts\NotoSansSC-VF.ttf",
+            r"C:\Windows\Fonts\NotoSerifSC-VF.ttf"
+        ]
+        for font_path in font_paths:
+            if os.path.exists(font_path):
+                try:
+                    font = pygame.font.Font(font_path, size)
+                    font.set_bold(bold)
+                    return font
+                except Exception:
+                    continue
+        try:
+            return pygame.font.Font(None, size)
+        except Exception:
+            return pygame.font.SysFont(None, size)
+
     def reset_game(self):
         """重置游戏"""
         self.grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
