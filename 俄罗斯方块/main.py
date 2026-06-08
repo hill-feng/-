@@ -133,7 +133,7 @@ class Tetris:
         self.start_button = Button(SCREEN_WIDTH // 2 - 100, 300, 200, 50, "开始游戏", self.font)
         self.leaderboard_button = Button(SCREEN_WIDTH // 2 - 100, 380, 200, 50, "排行榜", self.font)
         self.quit_button = Button(SCREEN_WIDTH // 2 - 100, 460, 200, 50, "退出", self.font)
-        self.restart_button = Button(SCREEN_WIDTH // 2 - 100, 550, 200, 50, "重新开始", self.font)
+        self.restart_button = Button(SCREEN_WIDTH // 2 - 100, 550, 200, 50, "返回菜单", self.font)
         
         # 游戏状态
         self.game_state = "menu"  # menu, playing, game_over, leaderboard, name_input
@@ -577,6 +577,8 @@ class Tetris:
                             self.move_piece(0, 1)
                         elif event.key == pygame.K_SPACE:
                             self.drop_piece()
+                        elif event.key == pygame.K_r:
+                            self.restart()
                         elif event.key == pygame.K_ESCAPE:
                             self.game_state = "menu"
                         
