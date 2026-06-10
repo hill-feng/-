@@ -11,6 +11,7 @@ from constants import (
 )
 from leaderboard import Leaderboard
 from button import Button
+from preview import NextPiecePreview
 
 
 class Tetris:
@@ -32,13 +33,19 @@ class Tetris:
         self.game_state = "menu"
         self.grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
         self.current_piece = None
+        self.next_piece = None
         self.current_piece_x = 0
         self.current_piece_y = 0
         self.current_color = None
+        self.next_color = None
         self.score = 0
         self.level = 1
         self.lines_cleared = 0
         self.game_over = False
+
+        self.next_preview = NextPiecePreview(
+            SCREEN_WIDTH - 140, 10, 130, 130, 22, self.small_font
+        )
 
         self.player_name = ""
         self.input_active = False
@@ -79,17 +86,27 @@ class Tetris:
         self.fall_speed = 500
         self.player_name = ""
         self.name_input_text = ""
+        self.next_piece = None
+        self.next_color = None
         self.spawn_new_piece()
 
     def spawn_new_piece(self):
-        shape_index = random.randint(0, len(SHAPES) - 1)
-        self.current_piece = [row[:] for row in SHAPES[shape_index]]
-        self.current_color = SHAPE_COLORS[shape_index]
+        if self.next_piece is None:
+            self.generate_next_piece()
+
+        self.current_piece = [row[:] for row in self.next_piece]
+        self.current_color = self.next_color
         self.current_piece_x = GRID_WIDTH // 2 - len(self.current_piece[0]) // 2
         self.current_piece_y = 0
+        self.generate_next_piece()
 
         if self.check_collision():
             self.game_over = True
+
+    def generate_next_piece(self):
+        shape_index = random.randint(0, len(SHAPES) - 1)
+        self.next_piece = [row[:] for row in SHAPES[shape_index]]
+        self.next_color = SHAPE_COLORS[shape_index]
 
     def rotate_piece(self):
         rotated = [[self.current_piece[y][x] for y in range(len(self.current_piece))]
@@ -275,6 +292,8 @@ class Tetris:
 
         lines_text = self.font.render(f"Lines: {self.lines_cleared}", True, WHITE)
         self.screen.blit(lines_text, (10, 90))
+
+        self.next_preview.draw(self.screen, self.next_piece, self.next_color)
 
     def draw_game_over(self):
         self.draw_game()
