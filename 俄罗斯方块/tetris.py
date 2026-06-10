@@ -245,7 +245,7 @@ class Tetris:
         self.restart_button.check_hover(mouse_pos)
         self.restart_button.draw(self.screen)
 
-        hint_text = self.small_font.render("Press ESC to return", True, GRAY)
+        hint_text = self.small_font.render("按 ESC 返回菜单", True, GRAY)
         self.screen.blit(hint_text, (SCREEN_WIDTH // 2 - 110, 670))
 
     def draw_game(self):
@@ -288,15 +288,15 @@ class Tetris:
         text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
         self.screen.blit(game_over_text, text_rect)
 
-        final_score_text = self.font.render(f"Final Score: {self.score}", True, WHITE)
+        final_score_text = self.font.render(f"最终得分: {self.score}", True, WHITE)
         score_rect = final_score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         self.screen.blit(final_score_text, score_rect)
 
-        hint_text = self.small_font.render("Press SPACE to save score", True, YELLOW)
+        hint_text = self.small_font.render("按 SPACE 保存分数", True, YELLOW)
         hint_rect = hint_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
         self.screen.blit(hint_text, hint_rect)
 
-        return_text = self.small_font.render("Press ESC to return to menu", True, GRAY)
+        return_text = self.small_font.render("按 ESC 返回菜单", True, GRAY)
         return_rect = return_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100))
         self.screen.blit(return_text, return_rect)
 
@@ -311,7 +311,7 @@ class Tetris:
         score_rect = score_info.get_rect(center=(SCREEN_WIDTH // 2, 180))
         self.screen.blit(score_info, score_rect)
 
-        label_text = self.font.render("Player Name:", True, WHITE)
+        label_text = self.font.render("玩家名字:", True, WHITE)
         self.screen.blit(label_text, (SCREEN_WIDTH // 2 - 170, 280))
 
         input_rect = pygame.Rect(SCREEN_WIDTH // 2 - 150, 320, 300, 50)
@@ -322,8 +322,8 @@ class Tetris:
         self.screen.blit(input_text, (input_rect.x + 10, input_rect.y + 10))
 
         mouse_pos = pygame.mouse.get_pos()
-        save_button = Button(SCREEN_WIDTH // 2 - 160, 420, 140, 40, "Save", self.font)
-        skip_button = Button(SCREEN_WIDTH // 2 + 20, 420, 140, 40, "Skip", self.font)
+        save_button = Button(SCREEN_WIDTH // 2 - 160, 420, 140, 40, "保存", self.font)
+        skip_button = Button(SCREEN_WIDTH // 2 + 20, 420, 140, 40, "跳过", self.font)
 
         save_button.check_hover(mouse_pos)
         skip_button.check_hover(mouse_pos)
