@@ -11,6 +11,7 @@ from constants import (
 )
 from leaderboard import Leaderboard
 from button import Button
+from preview import NextPiecePreview
 
 
 class Tetris:
@@ -24,21 +25,27 @@ class Tetris:
 
         self.leaderboard = Leaderboard()
 
-        self.start_button = Button(SCREEN_WIDTH // 2 - 100, 300, 200, 50, "开始游戏", self.font)
-        self.leaderboard_button = Button(SCREEN_WIDTH // 2 - 100, 380, 200, 50, "排行榜", self.font)
-        self.quit_button = Button(SCREEN_WIDTH // 2 - 100, 460, 200, 50, "退出", self.font)
-        self.restart_button = Button(SCREEN_WIDTH // 2 - 100, 550, 200, 50, "返回菜单", self.font)
+        self.start_button = Button(SCREEN_WIDTH // 2 - 100, 300, 200, 50, "开始游戏", self.font, GRAY)
+        self.leaderboard_button = Button(SCREEN_WIDTH // 2 - 100, 380, 200, 50, "排行榜", self.font, GRAY)
+        self.quit_button = Button(SCREEN_WIDTH // 2 - 100, 460, 200, 50, "退出", self.font, GRAY)
+        self.restart_button = Button(SCREEN_WIDTH // 2 - 100, 550, 200, 50, "返回菜单", self.font, GRAY)
 
         self.game_state = "menu"
         self.grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
         self.current_piece = None
+        self.next_piece = None
         self.current_piece_x = 0
         self.current_piece_y = 0
         self.current_color = None
+        self.next_color = None
         self.score = 0
         self.level = 1
         self.lines_cleared = 0
         self.game_over = False
+
+        self.next_preview = NextPiecePreview(
+            SCREEN_WIDTH - 140, 10, 130, 130, 22, self.small_font
+        )
 
         self.player_name = ""
         self.input_active = False
@@ -79,17 +86,27 @@ class Tetris:
         self.fall_speed = 500
         self.player_name = ""
         self.name_input_text = ""
+        self.next_piece = None
+        self.next_color = None
         self.spawn_new_piece()
 
     def spawn_new_piece(self):
-        shape_index = random.randint(0, len(SHAPES) - 1)
-        self.current_piece = [row[:] for row in SHAPES[shape_index]]
-        self.current_color = SHAPE_COLORS[shape_index]
+        if self.next_piece is None:
+            self.generate_next_piece()
+
+        self.current_piece = [row[:] for row in self.next_piece]
+        self.current_color = self.next_color
         self.current_piece_x = GRID_WIDTH // 2 - len(self.current_piece[0]) // 2
         self.current_piece_y = 0
+        self.generate_next_piece()
 
         if self.check_collision():
             self.game_over = True
+
+    def generate_next_piece(self):
+        shape_index = random.randint(0, len(SHAPES) - 1)
+        self.next_piece = [row[:] for row in SHAPES[shape_index]]
+        self.next_color = SHAPE_COLORS[shape_index]
 
     def rotate_piece(self):
         rotated = [[self.current_piece[y][x] for y in range(len(self.current_piece))]
@@ -203,6 +220,8 @@ class Tetris:
         pygame.display.flip()
 
     def draw_menu(self):
+        self.screen.fill(GRAY)
+
         title_text = self.large_font.render("俄罗斯方块", True, CYAN)
         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
         self.screen.blit(title_text, title_rect)
@@ -216,16 +235,18 @@ class Tetris:
         self.leaderboard_button.draw(self.screen)
         self.quit_button.draw(self.screen)
 
-        help_text = self.small_font.render("A/D: Move | W: Rotate | S: Down | Space: Drop", True, GRAY)
+        help_text = self.small_font.render("A/D 左右移 | W 旋转 | S 下移 | 空格 直落", True, GRAY)
         self.screen.blit(help_text, (10, 650))
 
     def draw_leaderboard(self):
+        self.screen.fill(GRAY)
+
         title_text = self.large_font.render("排行榜", True, CYAN)
         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 20))
         self.screen.blit(title_text, title_rect)
 
         top_scores = self.leaderboard.get_top(10)
-        header = self.font.render("等级  名字  分数  级别", True, WHITE)
+        header = self.font.render("名次  名称  分数  等级", True, WHITE)
         self.screen.blit(header, (20, 70))
 
         y_offset = 110
@@ -267,14 +288,16 @@ class Tetris:
             self.draw_piece(self.current_piece, self.current_piece_x,
                             self.current_piece_y, self.current_color)
 
-        score_text = self.font.render(f"Score: {self.score}", True, WHITE)
+        score_text = self.font.render(f"分数: {self.score}", True, WHITE)
         self.screen.blit(score_text, (10, 10))
 
-        level_text = self.font.render(f"Level: {self.level}", True, WHITE)
+        level_text = self.font.render(f"等级: {self.level}", True, WHITE)
         self.screen.blit(level_text, (10, 50))
 
-        lines_text = self.font.render(f"Lines: {self.lines_cleared}", True, WHITE)
+        lines_text = self.font.render(f"消除: {self.lines_cleared}", True, WHITE)
         self.screen.blit(lines_text, (10, 90))
+
+        self.next_preview.draw(self.screen, self.next_piece, self.next_color)
 
     def draw_game_over(self):
         self.draw_game()
@@ -284,7 +307,7 @@ class Tetris:
         overlay.fill(BLACK)
         self.screen.blit(overlay, (0, 0))
 
-        game_over_text = self.large_font.render("GAME OVER", True, RED)
+        game_over_text = self.large_font.render("游戏结束", True, RED)
         text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
         self.screen.blit(game_over_text, text_rect)
 
@@ -307,7 +330,7 @@ class Tetris:
         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
         self.screen.blit(title_text, title_rect)
 
-        score_info = self.font.render(f"Score: {self.score} | Level: {self.level}", True, WHITE)
+        score_info = self.font.render(f"分数: {self.score} | 等级: {self.level}", True, WHITE)
         score_rect = score_info.get_rect(center=(SCREEN_WIDTH // 2, 180))
         self.screen.blit(score_info, score_rect)
 
@@ -377,8 +400,8 @@ class Tetris:
                             self.game_state = "menu"
 
                     elif self.game_state == "name_input":
-                        save_button = Button(SCREEN_WIDTH // 2 - 160, 420, 140, 40, "Save", self.font)
-                        skip_button = Button(SCREEN_WIDTH // 2 + 20, 420, 140, 40, "Skip", self.font)
+                        save_button = Button(SCREEN_WIDTH // 2 - 160, 420, 140, 40, "保存", self.font)
+                        skip_button = Button(SCREEN_WIDTH // 2 + 20, 420, 140, 40, "跳过", self.font)
 
                         if save_button.is_clicked(pos):
                             self.leaderboard.add_score(

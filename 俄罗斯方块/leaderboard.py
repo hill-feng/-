@@ -27,7 +27,7 @@ class Leaderboard:
     def add_score(self, name, score, level, lines):
         """添加分数到排行榜"""
         entry = {
-            "name": name if name else "Anonymous",
+            "name": name if name else "匿名玩家",
             "score": score,
             "level": level,
             "lines": lines,
